@@ -4,6 +4,7 @@ import com.tutorial.crud.dto.Mensaje;
 import com.tutorial.crud.dto.ProductoDto;
 import com.tutorial.crud.entity.Producto;
 import com.tutorial.crud.service.ProductoService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,20 +14,21 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/producto")
-@CrossOrigin(origins = "http://localhost:4200")
+@RequestMapping("/api")
+@CrossOrigin
 public class ProductoController {
 
     @Autowired
     ProductoService productoService;
 
-    @GetMapping("/lista")
+    @Operation(summary = "List accounts", description = "Lists accounts", tags = {"products"})
+    @GetMapping("/producto/lista")
     public ResponseEntity<List<Producto>> list(){
         List<Producto> list = productoService.list();
         return new ResponseEntity(list, HttpStatus.OK);
     }
 
-    @GetMapping("/detail/{id}")
+    @GetMapping("/producto/detail/{id}")
     public ResponseEntity<Producto> getById(@PathVariable("id") int id){
         if(!productoService.existsById(id))
             return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
@@ -34,7 +36,7 @@ public class ProductoController {
         return new ResponseEntity(producto, HttpStatus.OK);
     }
 
-    @GetMapping("/detailname/{nombre}")
+    @GetMapping("/producto/detailname/{nombre}")
     public ResponseEntity<Producto> getByNombre(@PathVariable("nombre") String nombre){
         if(!productoService.existsByNombre(nombre))
             return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
@@ -42,7 +44,7 @@ public class ProductoController {
         return new ResponseEntity(producto, HttpStatus.OK);
     }
 
-    @PostMapping("/create")
+    @PostMapping("/producto/create")
     public ResponseEntity<?> create(@RequestBody ProductoDto productoDto){
         if(StringUtils.isBlank(productoDto.getNombre()))
             return new ResponseEntity(new Mensaje("el nombre es obligatorio"), HttpStatus.BAD_REQUEST);
@@ -55,7 +57,7 @@ public class ProductoController {
         return new ResponseEntity(new Mensaje("producto creado"), HttpStatus.OK);
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/producto/update/{id}")
     public ResponseEntity<?> update(@PathVariable("id")int id, @RequestBody ProductoDto productoDto){
         if(!productoService.existsById(id))
             return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
@@ -73,13 +75,11 @@ public class ProductoController {
         return new ResponseEntity(new Mensaje("producto actualizado"), HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/producto/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable("id")int id){
         if(!productoService.existsById(id))
             return new ResponseEntity(new Mensaje("no existe"), HttpStatus.NOT_FOUND);
         productoService.delete(id);
         return new ResponseEntity(new Mensaje("producto eliminado"), HttpStatus.OK);
     }
-
-
 }
